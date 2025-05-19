@@ -85,7 +85,7 @@ DefaultSettings :: proc () -> Settings{
 }
 
 settings := DefaultSettings()
-camera: Camera
+//camera: Camera
 
 FlipYAxis :: proc "c" ()
 {
@@ -105,8 +105,9 @@ main :: proc() {
 	settings.window_width = 1920
 
 
-	camera.height = settings.window_height
-	camera.width = settings.window_width
+	//camera.height = settings.window_height
+	//camera.width = settings.window_width
+
 
 	rl.SetConfigFlags({.MSAA_4X_HINT, .INTERLACED_HINT, .VSYNC_HINT, })
 	rl.InitWindow(settings.window_width, settings.window_height, "Box2d demo")
@@ -123,6 +124,7 @@ main :: proc() {
 
 	draw_create(&draw)
 	pinball := pinball_create(&settings)
+
 
 
 

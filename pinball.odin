@@ -22,8 +22,8 @@ pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 	sample_init(&sample, settings);
 
 	if settings.restart {
-		camera.center = {0.0, 9.0}
-		camera.zoom   = 25 * 0.5
+		//camera.center = {0.0, 9.0}
+		//camera.zoom   = 25 * 0.5
 	}
 
 	settings.draw_joints = false
