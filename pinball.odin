@@ -21,11 +21,6 @@ pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 
 	sample_init(&sample, settings);
 
-	if settings.restart {
-		//camera.center = {0.0, 9.0}
-		//camera.zoom   = 25 * 0.5
-	}
-
 	settings.draw_joints = false
 
 
@@ -126,41 +121,35 @@ pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 		j = b2.CreateRevoluteJoint( world_id , jointDef );
 	}
 
-		// Bumpers
-		{
-			body_def := b2.DefaultBodyDef()
-			body_def.position = { -4.0, 8.0 };
+	{
+		body_def := b2.DefaultBodyDef()
+		body_def.position = { -4.0, 8.0 };
 
-			bodyId := b2.CreateBody( world_id, body_def);
+		bodyId := b2.CreateBody( world_id, body_def);
 
-			shapeDef := b2.DefaultShapeDef();
-			shapeDef.material.restitution = 1.5;
+		shapeDef := b2.DefaultShapeDef();
+		shapeDef.material.restitution = 1.5;
 
-			circle : b2.Circle= { { 0.0, 0.0 }, 1.0 };
-			c := b2.CreateCircleShape( bodyId, shapeDef, circle );
+		circle : b2.Circle= { { 0.0, 0.0 }, 1.0 };
+		c := b2.CreateCircleShape( bodyId, shapeDef, circle );
 
-			body_def.position = { 4.0, 17.0 };
-			bodyId = b2.CreateBody( world_id , body_def);
-			c = b2.CreateCircleShape( bodyId, shapeDef, circle );
-		}
+		body_def.position = { 4.0, 17.0 };
+		bodyId = b2.CreateBody( world_id , body_def);
+		c = b2.CreateCircleShape( bodyId, shapeDef, circle );
+	}
 
-		// Ball
-		{
-			bodyDef :b2.BodyDef = b2.DefaultBodyDef();
-			bodyDef.position = { 1.0, 15.0 };
-			bodyDef.type = .dynamicBody;
-			bodyDef.isBullet = true;
+	{
+		bodyDef :b2.BodyDef = b2.DefaultBodyDef();
+		bodyDef.position = { 1.0, 15.0 };
+		bodyDef.type = .dynamicBody;
+		bodyDef.isBullet = true;
 
-			ball_id = b2.CreateBody( world_id , bodyDef );
+		ball_id = b2.CreateBody( world_id , bodyDef );
 
-			shapeDef := b2.DefaultShapeDef();
-			circle :b2.Circle= { { 0.0, 0.0 }, 0.2 };
-			c := b2.CreateCircleShape( ball_id, shapeDef, circle );
-		}
-
-
-
-
+		shapeDef := b2.DefaultShapeDef();
+		circle :b2.Circle= { { 0.0, 0.0 }, 0.2 };
+		c := b2.CreateCircleShape( ball_id, shapeDef, circle );
+	}
 
 	return pinball
 }

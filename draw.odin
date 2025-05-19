@@ -34,7 +34,6 @@ DrawPolygon :: proc "c" (vertices: [^]b2.Vec2, vertexCount: i32, color: b2.HexCo
         rl.DrawLineV( v1, v2, c)
     }
 
-
     v1 := vertices[vertexCount - 1] 
     v2 := vertices[0] 
     rl.DrawLineV(v1, v2, c)
@@ -45,29 +44,51 @@ DrawPolygon :: proc "c" (vertices: [^]b2.Vec2, vertexCount: i32, color: b2.HexCo
 DrawSolidPolygon :: proc "c" (transform: b2.Transform, vertices: [^]b2.Vec2, vertexCount: i32, radius: f32, colr: b2.HexColor, ctx: rawptr ){
 
     context = runtime.default_context()
+    transform := transform
 
     new_vertices := make([]b2.Vec2, vertexCount)
+    vertices_copy := make([]b2.Vec2, vertexCount)
+
+    for i in 0..<vertexCount{
+        vertices_copy[i] = vertices[i] 
+
+            vertices_copy[i].y *= -1
+    }
 
 
 
     for i in 0..<vertexCount{
-        new_vertices[i] = b2.TransformPoint(transform, vertices[i])
+
+        new_vertices[i] = b2.TransformPoint(transform, vertices_copy[i])
     }
 
 
+
     c := make_rgba8(colr, 1.0)
-    d := make_rgba8(colr, .5)
+    d := make_rgba8(colr, 0.5)
 
-    rl.DrawTriangleFan(&new_vertices[0], vertexCount, d)
+    //rl.DrawTriangleFan(&new_vertices[0], vertexCount, d)
 
-            // Draw polygon outline
-        c.a = 255; // Full alpha for outline
-        for i in 0..<vertexCount{
-            nextIndex :i32= (i + 1) % vertexCount;
-            start :rl.Vector2= { new_vertices[i].x, new_vertices[i].y };
-            end :rl.Vector2= { new_vertices[nextIndex].x, new_vertices[nextIndex].y };
-            rl.DrawLineV(start, end, c);
-        }
+
+
+
+    for i in 1..<vertexCount-1 {
+        rl.DrawTriangle(
+            new_vertices[0],
+            new_vertices[i],
+            new_vertices[i+1],
+            d
+            )
+    }
+
+    // Draw polygon outline
+    c.a = 255; // Full alpha for outline
+    for i in 0..<vertexCount{
+        nextIndex :i32= (i + 1) % vertexCount;
+        start :rl.Vector2= { new_vertices[i].x, new_vertices[i].y };
+        end :rl.Vector2= { new_vertices[nextIndex].x, new_vertices[nextIndex].y };
+        rl.DrawLineV(start, end, c);
+    }
 
     delete(new_vertices)
 
@@ -76,7 +97,7 @@ DrawSolidPolygon :: proc "c" (transform: b2.Transform, vertices: [^]b2.Vec2, ver
 
 // Draw a circle.
 DrawCircle:: proc "c" (center: b2.Vec2, radius: f32, color: b2.HexColor, ctx: rawptr){
-    p := center 
+    p := center
     rl.DrawCircleLinesV(p, radius, make_rgba8(color, 1.0))
 }
 
@@ -90,12 +111,10 @@ DrawSolidCircle:: proc "c" (transform: b2.Transform, radius: f32, color: b2.HexC
 
     c := make_rgba8(color, 1.0)
     d := make_rgba8(color, 0.5)
-    p := transform.p 
-
-    rl.BeginBlendMode(.ALPHA)
+    p := transform.p
 
 
-    //rl.DrawCircleV(p, radius, d)
+    rl.DrawCircleV(p, radius, d)
 
 
     segments := 32
@@ -129,8 +148,6 @@ DrawSolidCircle:: proc "c" (transform: b2.Transform, radius: f32, color: b2.HexC
         p.y + math.sin(b2.Rot_GetAngle(transform.q)) * radius,
     }
     rl.DrawLineV(p, orientationEnd, c);
-
-    rl.EndBlendMode()
 }
 
 // Draw a solid capsule.
@@ -164,7 +181,7 @@ DrawSolidCapsule :: proc "c" (p1, p2: b2.Vec2, radius: f32, color: b2.HexColor, 
 
                 // Draw filled rectangle (center part of capsule)
         rl.DrawTriangleFan(&rectVertices[0], 4, c);
-        
+
         // Draw filled circles at ends
         rl.DrawCircleV(start, radius, c);
         rl.DrawCircleV(end, radius,   c);
@@ -174,26 +191,26 @@ DrawSolidCapsule :: proc "c" (p1, p2: b2.Vec2, radius: f32, color: b2.HexColor, 
     }
 
         // Draw outline with full alpha
-    
+
     // Draw capsule outline
     if (length > 0)
     {
         // Draw connecting lines
         perp : rl.Vector2 = { -dir.y, dir.x };
-        
+
         topRight :rl.Vector2= { start.x + perp.x * radius, start.y + perp.y * radius };
         bottomRight :rl.Vector2= { end.x + perp.x * radius, end.y + perp.y * radius };
         rl.DrawLineV(topRight, bottomRight, c);
-        
+
         topLeft :rl.Vector2= { start.x - perp.x * radius, start.y - perp.y * radius };
         bottomLeft :rl.Vector2= { end.x - perp.x * radius, end.y - perp.y * radius };
         rl.DrawLineV(topLeft, bottomLeft, c);
-        
+
         // Draw semicircle arcs
         segments :f32= 16;
         angleStep :f32 = b2.PI / segments;
         angle := math.atan2(dir.y, dir.x);
-        
+
         // Draw first semicircle (start point)
         for i in 0..=segments{
             a := angle + b2.PI /2 + angleStep * i;
@@ -201,7 +218,7 @@ DrawSolidCapsule :: proc "c" (p1, p2: b2.Vec2, radius: f32, color: b2.HexColor, 
             p2 :rl.Vector2 = { start.x + math.cos(a + angleStep) * radius, start.y + math.sin(a + angleStep) * radius };
             rl.DrawLineV(p1, p2, c);
         }
-        
+
         // Draw second semicircle (end point)
         for i in 0..=segments{
             a := angle - b2.PI /2 + angleStep * i;
@@ -244,31 +261,26 @@ DrawTransform :: proc "c" (transform: b2.Transform, ctx: rawptr){
 }
 
 DrawPoint :: proc "c" (p: b2.Vec2, size: f32, color: b2.HexColor, ctx: rawptr){
-
+    context = runtime.default_context()
     c := make_rgba8(color, 1)
-    rl.DrawCircleV(p, size, c)
+    rl.DrawCircleV(p, size/cam.zoom, c)
 }
 
 // Draw a string in world space.
 DrawString :: proc "c" (p: b2.Vec2, s: cstring, color: b2.HexColor, ctx: rawptr){
     //rl.DrawText(s, i32(p.x), i32(p.y), 20, rl.BLACK)
 
-
     rl.EndMode2D()
-    FlipYAxis()
-
     c := make_rgba8(color, 1.0)
-
     p := p
     p *= cam.zoom
-    p.y = f32(rl.GetRenderHeight())/1.1 - p.y
+    //p.y += cam.offset.y
+    p.y += cam.offset.y
     p.x += cam.offset.x
     rl.DrawText(s, i32(p.x), i32(p.y), 15, c)
 
     rl.BeginMode2D(cam)
-    FlipYAxis()
 
-    
 }
 
 

@@ -59,15 +59,8 @@ sample_step :: proc(using sample: ^Sample,  settings : ^Settings){
             text_line += text_increment
         }
     }
-    //draw.debug_draw.drawingBounds = camera_get_view_bounds(camera)
-    //draw.debug_draw.useDrawingBounds = settings.user_camera_bounds
-
     b2.World_Step(world_id, time_step, settings.sub_step_count)
     rl.BeginMode2D(cam)
-    FlipYAxis()
-    
     b2.World_Draw(world_id, &draw.debug_draw)
-
     rl.EndMode2D()
-    FlipYAxis()
 }
