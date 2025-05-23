@@ -7,13 +7,19 @@ Smash :: struct {
 	using sample : Sample
 }
 
+smash_reset_camera :: proc(smash : ^Smash){
+	{
+		cam.offset = {432,432}
+		cam.zoom   = 20
+	}
+}
+
 create_smash :: proc(settings: ^Settings) -> ^Smash{
 
 	smash := new(Smash)
 	using smash
 
 	sample_init(&sample, settings)
-
 
 	b2.World_SetGravity(world_id, b2.Vec2_zero)
 
@@ -56,11 +62,8 @@ create_smash :: proc(settings: ^Settings) -> ^Smash{
 			s := b2.CreatePolygonShape(body_id, shape_def, box)
 		}
 	}
-
-
-
-
-
-
 	return smash
+}
+smash_step :: proc(using smash: ^Smash, settings: ^Settings){
+	sample_step_basic(&sample, settings)
 }

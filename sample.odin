@@ -71,7 +71,6 @@ sample_step_basic :: proc(using sample: ^Sample,  settings : ^Settings){
 }
 
 sample_step :: proc(sample: SampleUnion, settings: ^Settings){
-
     switch v in sample{
         case ^DoubleDomino:{
             dominos_step(v, settings)
@@ -79,12 +78,30 @@ sample_step :: proc(sample: SampleUnion, settings: ^Settings){
         case ^PinBall:{
             pinball_step(v, settings)
         }
+        case ^Smash:{
+            smash_step(v, settings)
+        }
+    }
+}
+
+reset_camera_proc :: proc {
+    smash_reset_camera,
+    pinball_reset_camera,
+    dd_reset_camera,
+}
+
+reset_camera :: proc(sample: SampleUnion){
+    switch v in sample{
+        case ^DoubleDomino: reset_camera_proc(v)
+        case ^PinBall:      reset_camera_proc(v)
+        case ^Smash:        reset_camera_proc(v)
     }
 }
 
 reset_all :: proc(){
     samples[.DOUBLE_DOMINO] = cast(SampleUnion)create_double_domino(&settings)
     samples[.PINBALL]       = cast(SampleUnion)pinball_create(&settings)
+    samples[.SMASH]         = cast(SampleUnion)create_smash(&settings)
 }
 
 

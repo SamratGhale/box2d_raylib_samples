@@ -19,12 +19,15 @@ background_rt : rl.RenderTexture2D
 
 SampleUnion :: union {
 	^PinBall,
-	^DoubleDomino
+	^DoubleDomino,
+	^Smash,
+
 }
 
 SampleType :: enum{
 	PINBALL,
-	DOUBLE_DOMINO
+	DOUBLE_DOMINO,
+	SMASH,
 }
 
 //sample : SampleUnion
@@ -151,6 +154,8 @@ update_ui :: proc(){
 					for type in SampleType{
 						if im.Selectable(fmt.ctprint(type)){
 							curr_sample = type
+
+							reset_camera(samples[curr_sample])
 						}
 					}
 					im.EndCombo()
@@ -210,6 +215,7 @@ main :: proc() {
 	curr_sample = .PINBALL
 
 	reset_all()
+	reset_camera(samples[curr_sample])
 
 	draw.show_ui = true
 

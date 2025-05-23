@@ -6,6 +6,14 @@ DoubleDomino :: struct {
 	using sample: Sample,
 }
 
+dd_reset_camera :: proc(dd : ^DoubleDomino){
+	{
+		cam.offset = {909, 310}
+		cam.zoom   = 92
+	}
+}
+
+
 create_double_domino :: proc(settings: ^Settings)-> ^DoubleDomino{
 
 	dd := new(DoubleDomino)

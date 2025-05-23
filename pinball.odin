@@ -14,6 +14,13 @@ PinBall :: struct {
 	using sample : Sample,
 }
 
+pinball_reset_camera :: proc(pinball: ^PinBall){
+	{
+		cam.zoom = 45.0
+		cam.offset = {940, 141}
+	}
+}
+
 pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 
 	pinball := new(PinBall)
@@ -22,11 +29,6 @@ pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 	sample_init(&sample, settings);
 
 	settings.draw_joints = false
-
-	{
-		cam.zoom = 45.0
-		cam.offset = {940, 141}
-	}
 
 
 	//Ground body
