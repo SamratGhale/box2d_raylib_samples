@@ -300,12 +300,12 @@ draw_create :: proc(using draw : ^Draw){
 
     debug_draw.drawBounds = false
     debug_draw.drawShapes = true
-    debug_draw.drawJoints = true
+    debug_draw.drawJoints = false
     debug_draw.drawJointExtras = false
     debug_draw.drawMass = false
-    debug_draw.drawContacts = true
-    debug_draw.drawFrictionImpulses = true
-    debug_draw.drawContactNormals = true
+    debug_draw.drawContacts = false
+    debug_draw.drawFrictionImpulses = false
+    debug_draw.drawContactNormals = false
     debug_draw.drawBodyNames = false
 
 }

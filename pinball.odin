@@ -23,6 +23,11 @@ pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 
 	settings.draw_joints = false
 
+	{
+		cam.zoom = 45.0
+		cam.offset = {940, 141}
+	}
+
 
 	//Ground body
 	ground_id : b2.BodyId
@@ -157,7 +162,7 @@ pinball_create :: proc(settings: ^Settings) -> ^PinBall{
 
 pinball_step :: proc (using pinball : ^PinBall, settings : ^Settings){
 
-	sample_step(&pinball.sample, settings)
+	sample_step_basic(&pinball.sample, settings)
 
 	if rl.IsKeyDown(.SPACE){
 		b2.RevoluteJoint_SetMotorSpeed(left_joint,    20)

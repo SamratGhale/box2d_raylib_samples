@@ -3,6 +3,7 @@ package main
 import "base:runtime"
 import "core:fmt"
 import im "shared:odin-imgui"
+import "core:reflect"
 import gl "vendor:OpenGL"
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
@@ -14,6 +15,24 @@ import rlgl "vendor:raylib/rlgl"
 
 imgui_rt : rl.RenderTexture2D
 background_rt : rl.RenderTexture2D
+
+
+SampleUnion :: union {
+	^PinBall,
+	^DoubleDomino
+}
+
+SampleType :: enum{
+	PINBALL,
+	DOUBLE_DOMINO
+}
+
+//sample : SampleUnion
+
+
+samples : [SampleType]SampleUnion
+
+curr_sample : SampleType
 
 Settings :: struct {
 	sample_index : i32,
@@ -128,6 +147,19 @@ update_ui :: proc(){
 				im.SliderFloat( " target x", &cam.target.y , 0, 20);
 				im.SliderFloat( " target y", &cam.target.x , 0, 20);
 
+				if im.BeginCombo("Program", fmt.ctprint(curr_sample)){
+					for type in SampleType{
+						if im.Selectable(fmt.ctprint(type)){
+							curr_sample = type
+						}
+					}
+					im.EndCombo()
+				}
+
+
+				if im.Button( "reset "){
+					reset_all()
+				}
 
 				im.EndTabItem()
 
@@ -138,6 +170,11 @@ update_ui :: proc(){
 	 }
 
 }
+
+
+
+
+
 main :: proc() {
 
 	settings.workerCount = 4
@@ -145,10 +182,8 @@ main :: proc() {
 	settings.window_height = 1080
 	settings.window_width = 1920
 
-
 	//camera.height = settings.window_height
 	//camera.width = settings.window_width
-
 
 	rl.SetConfigFlags({.MSAA_4X_HINT, .INTERLACED_HINT, .VSYNC_HINT, })
 	rl.InitWindow(settings.window_width, settings.window_height, "Box2d demo")
@@ -166,29 +201,21 @@ main :: proc() {
 
 	//To flip
 	background_rt = rl.LoadRenderTexture(settings.window_width, settings.window_height)
+	cam.target = {0, 0}
+	cam.offset = (rl.Vector2){ 0,f32(rl.GetRenderHeight()/6)};
+
 
 	draw_create(&draw)
-	pinball := pinball_create(&settings)
 
-	//smash := create_smash(&settings)
+	curr_sample = .PINBALL
 
-
-
-
-	cam.target = {0, 0}
-	cam.offset = (rl.Vector2){ f32(rl.GetRenderWidth()/2),f32(rl.GetRenderHeight()/6)};
-	cam.zoom = 45.0;
+	reset_all()
 
 	draw.show_ui = true
 
-	rlgl.DisableBackfaceCulling()
-
+	//rlgl.DisableBackfaceCulling()
 
 	for !rl.WindowShouldClose(){
-
-		time := rl.GetTime()
-
-
 
 		free_all(context.temp_allocator)	
 
@@ -203,18 +230,12 @@ main :: proc() {
 			rl.EndTextureMode()
 		}
 
-
-
-
 		rl.BeginTextureMode(background_rt)
-		pinball_step(pinball, &settings)
+		sample_step(samples[curr_sample], &settings)
 		rl.EndTextureMode()
-		//sample_step(&smash.sample, &settings)
 
 
 		update_ui()
-
-
 		{
 			rl.BeginTextureMode(imgui_rt)
 			imgui_rl_end()

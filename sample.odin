@@ -30,6 +30,9 @@ Sample :: struct {
 }
 
 sample_init :: proc(using sample: ^Sample, settings: ^Settings){
+
+
+
     world_def := b2.DefaultWorldDef()
     world_def.userTaskContext = rawptr(sample)
     world_def.enableSleep = settings.enable_sleep
@@ -44,8 +47,10 @@ sample_init :: proc(using sample: ^Sample, settings: ^Settings){
 }
 
 
-sample_step :: proc(using sample: ^Sample,  settings : ^Settings){
+sample_step_basic :: proc(using sample: ^Sample,  settings : ^Settings){
     time_step := settings.hertz > 0.0 ? 1.0 / settings.hertz : 0.0
+
+    if rl.IsKeyPressed(.P) do settings.pause = !settings.pause
 
     if settings.pause{
         if settings.single_step{
@@ -64,3 +69,47 @@ sample_step :: proc(using sample: ^Sample,  settings : ^Settings){
     b2.World_Draw(world_id, &draw.debug_draw)
     rl.EndMode2D()
 }
+
+sample_step :: proc(sample: SampleUnion, settings: ^Settings){
+
+    switch v in sample{
+        case ^DoubleDomino:{
+            dominos_step(v, settings)
+        }
+        case ^PinBall:{
+            pinball_step(v, settings)
+        }
+    }
+}
+
+reset_all :: proc(){
+    samples[.DOUBLE_DOMINO] = cast(SampleUnion)create_double_domino(&settings)
+    samples[.PINBALL]       = cast(SampleUnion)pinball_create(&settings)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
